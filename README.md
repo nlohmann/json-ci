@@ -19,3 +19,4 @@ The goal is to provide a fairly recent C++ build and analysis tool chain.
 - include-what-you-use 0.12
 - CMake 3.16.3
 - Ninja 1.10.1
+- Valgrind 3.15.0

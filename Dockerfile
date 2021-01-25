@@ -5,7 +5,7 @@ FROM ubuntu:latest
 ###############
 
 RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake ninja-build make unzip iwyu libidn11
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install git cmake ninja-build make unzip iwyu libidn11 valgrind
 
 ####################
 # get latest Clang #
