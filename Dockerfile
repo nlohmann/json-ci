@@ -48,3 +48,13 @@ RUN cd ~ && \
     rm ${OCLINT_RELEASE}
 
 ENV PATH=${PATH}:/root/oclint-20.11/bin
+
+##################
+# get PVS Studio #
+##################
+
+# see https://www.viva64.com/en/m/0039/#IDA60A8D2301
+RUN wget -q -O - https://files.viva64.com/etc/pubkey.txt | apt-key add - && \
+    wget -O /etc/apt/sources.list.d/viva64.list https://files.viva64.com/etc/viva64.list && \
+    apt-get update && \
+    apt-get install -y pvs-studio
