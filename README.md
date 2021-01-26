@@ -22,3 +22,4 @@ Versions (as of 2021-01-26):
 - CMake 3.16.3
 - Ninja 1.10.1
 - Valgrind 3.15.0
+- OCLint 20.11

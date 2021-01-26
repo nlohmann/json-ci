@@ -35,3 +35,16 @@ RUN git clone --depth 1 https://github.com/danmar/cppcheck.git && \
     cmake -S cppcheck -B cppcheck/build -G Ninja -DCMAKE_BUILD_TYPE=Release && \
     cmake --build cppcheck/build --target install && \
     rm -fr cppcheck
+
+######################
+# get latest OCLint #
+#####################
+
+ENV OCLINT_RELEASE=oclint-20.11-llvm-11.0.0-x86_64-linux-ubuntu-20.04.tar.gz
+
+RUN cd ~ && \
+    wget https://github.com/oclint/oclint/releases/download/v20.11/${OCLINT_RELEASE} && \
+    tar xfz ${OCLINT_RELEASE} && \
+    rm ${OCLINT_RELEASE}
+
+ENV PATH=${PATH}:/root/oclint-20.11/bin
