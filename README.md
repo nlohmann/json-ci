@@ -12,8 +12,10 @@ docker pull nlohmann/json-ci:latest
 
 The goal is to provide a fairly recent C++ build and analysis tool chain.
 
-- Clang version 11.1.0
-- GCC 11.0.0 20210117 (experimental)
+Versions (as of 2021-01-26):
+
+- Clang 11.1.0-++20210112083037+9bbcb554cdbf-1~exp1~20210112193657.159
+- GCC 11.0.0-20210124git6b1633378b74
 - Cppcheck 2.3
 - Clang-Tidy 11.1.0
 - include-what-you-use 0.12
