@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     git cmake ninja-build make unzip iwyu libidn11 valgrind \
-    lsb-release wget software-properties-common clang-tools-11 clang-tidy-11
+    lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov
 
 ####################
 # get latest Clang #

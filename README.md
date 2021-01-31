@@ -24,3 +24,4 @@ Versions (as of 2021-01-26):
 - Valgrind 3.15.0
 - OCLint 20.11
 - PVS Studio 7.11.44204.104-1
+- LCOV 1.14
