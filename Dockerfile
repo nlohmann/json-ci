@@ -7,8 +7,17 @@ FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
-    git cmake ninja-build make unzip iwyu libidn11 valgrind \
+    git astyle ninja-build make unzip iwyu libidn11 valgrind \
     lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov
+
+####################
+# get latest CMake #
+####################
+
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4-Linux-x86_64.sh && \
+    chmod a+x cmake-3.19.4-Linux-x86_64.sh && \
+    ./cmake-3.19.4-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
+    rm cmake-3.19.4-Linux-x86_64.sh
 
 ####################
 # get latest Clang #
