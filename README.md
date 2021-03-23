@@ -12,17 +12,17 @@ docker pull nlohmann/json-ci:latest
 
 The goal is to provide a fairly recent C++ build and analysis tool chain.
 
-Versions (as of 2021-02-08):
+Versions (as of 2021-03-23):
 
 - Clang 11.1.0-++20210204121720+1fdec59bffc1-1~exp1~20210203232336.162
-- GCC 11.0.0-20210207git3d912941f29c
-- Cppcheck 2.3
+- GCC 11.0.1 20210321
+- Cppcheck 2.4
 - Clang-Tidy 11.1.0
 - include-what-you-use 0.12
-- CMake 3.19.4
+- CMake 3.19.7
 - Ninja 1.10.1
 - Valgrind 3.15.0
-- OCLint 20.11
-- PVS Studio 7.11.44204.104-1
+- OCLint 21.03
+- PVS Studio 7.12.46137.116
 - LCOV 1.14
 - Artistic Style 3.1

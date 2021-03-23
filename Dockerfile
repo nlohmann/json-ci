@@ -14,10 +14,10 @@ RUN apt-get update && apt-get install -y \
 # get latest CMake #
 ####################
 
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4-Linux-x86_64.sh && \
-    chmod a+x cmake-3.19.4-Linux-x86_64.sh && \
-    ./cmake-3.19.4-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
-    rm cmake-3.19.4-Linux-x86_64.sh
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.7/cmake-3.19.7-Linux-x86_64.sh && \
+    chmod a+x cmake-3.19.7-Linux-x86_64.sh && \
+    ./cmake-3.19.7-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
+    rm cmake-3.19.7-Linux-x86_64.sh
 
 ####################
 # get latest Clang #
@@ -49,14 +49,14 @@ RUN git clone --depth 1 https://github.com/danmar/cppcheck.git && \
 # get latest OCLint #
 #####################
 
-ENV OCLINT_RELEASE=oclint-20.11-llvm-11.0.0-x86_64-linux-ubuntu-20.04.tar.gz
+ENV OCLINT_RELEASE=oclint-21.03-llvm-11.1.0-x86_64-linux-ubuntu-20.04.tar.gz
 
 RUN cd ~ && \
-    wget https://github.com/oclint/oclint/releases/download/v20.11/${OCLINT_RELEASE} && \
+    wget https://github.com/oclint/oclint/releases/download/v21.03/${OCLINT_RELEASE} && \
     tar xfz ${OCLINT_RELEASE} && \
     rm ${OCLINT_RELEASE}
 
-ENV PATH=${PATH}:/root/oclint-20.11/bin
+ENV PATH=${PATH}:/root/oclint-21.03/bin
 
 ##################
 # get PVS Studio #
