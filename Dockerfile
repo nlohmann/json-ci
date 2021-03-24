@@ -6,9 +6,12 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
-    git astyle ninja-build make unzip iwyu libidn11 valgrind \
-    lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git astyle ninja-build make unzip iwyu libidn11 valgrind \
+        lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov gpg-agent && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ####################
 # get latest CMake #
@@ -66,4 +69,6 @@ ENV PATH=${PATH}:/root/oclint-21.03/bin
 RUN wget -q -O - https://files.viva64.com/etc/pubkey.txt | apt-key add - && \
     wget -O /etc/apt/sources.list.d/viva64.list https://files.viva64.com/etc/viva64.list && \
     apt-get update && \
-    apt-get install -y pvs-studio
+    apt-get install -y --no-install-recommends pvs-studio && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
