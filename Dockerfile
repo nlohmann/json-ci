@@ -43,7 +43,7 @@ RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 11 && rm 
 ##################
 
 # see https://jwakely.github.io/pkg-gcc-latest/
-RUN wget http://kayari.org/gcc-latest/gcc-latest.deb && dpkg -i gcc-latest.deb && rm gcc-latest.deb
+RUN wget http://kayari.org/gcc-latest/gcc-latest.deb && dpkg -i gcc-latest.deb && rm gcc-latest.deb && ln -s /opt/gcc-latest/bin/g++ /opt/gcc-latest/bin/g++-latest
 
 ENV PATH=/opt/gcc-latest/bin:${PATH}
 ENV LD_RUN_PATH=/opt/gcc-latest/lib64:${LD_RUN_PATH}
