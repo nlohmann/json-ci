@@ -7,9 +7,18 @@ FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial main" && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial universe" && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial-updates main" && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial-updates universe" && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
         git astyle ninja-build make unzip iwyu libidn11 valgrind \
-        lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov gpg-agent && \
+        lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov gpg-agent nvidia-cuda-toolkit \
+        g++-4.8 g++-4.9 g++-5 g++-7 g++-8 g++-9 g++-10 \
+        clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -17,10 +26,10 @@ RUN apt-get update && \
 # get latest CMake #
 ####################
 
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.7/cmake-3.19.7-Linux-x86_64.sh && \
-    chmod a+x cmake-3.19.7-Linux-x86_64.sh && \
-    ./cmake-3.19.7-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
-    rm cmake-3.19.7-Linux-x86_64.sh
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0-Linux-x86_64.sh && \
+    chmod a+x cmake-3.20.0-Linux-x86_64.sh && \
+    ./cmake-3.20.0-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
+    rm cmake-3.20.0-Linux-x86_64.sh
 
 ####################
 # get latest Clang #
