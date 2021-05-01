@@ -88,3 +88,16 @@ RUN wget -q -O - https://files.viva64.com/etc/pubkey.txt | apt-key add - && \
 
 RUN wget -q -O - "https://github.com/facebook/infer/releases/download/v1.1.0/infer-linux64-v1.1.0.tar.xz" | tar -C /opt -xJ && \
     ln -s "/opt/infer-linux64-v1.1.0/bin/infer" /usr/local/bin/infer
+
+###################
+# Intel compilers #
+###################
+
+RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+    APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+    rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+    add-apt-repository -y "deb https://apt.repos.intel.com/oneapi all main" && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

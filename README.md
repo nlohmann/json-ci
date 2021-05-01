@@ -16,6 +16,8 @@ Versions (as of 2021-04-24):
 
 - Clang 12.0.1-++20210423082613+072c90a863aa-1~exp1~20210423063319.76
 - GCC 11.0.1 20210321 (experimental)
+- ICC 2021.2.0 20210228
+- Intel(R) oneAPI DPC++ Compiler 2021.2.0 (2021.2.0.20210317)
 - Cppcheck 2.4
 - Clang-Tidy 11.1.0
 - include-what-you-use 0.12
@@ -50,8 +52,19 @@ Furthermore, some "historic" C++ compilers are available:
 - clang 9.0.1
 - clang 10.0.0
 - clang 11.0.0
-- nvcc 10.1
+- nvcc 10.1.243
 
+
+### Scripts
+
+Make Intel compilers available:
+
+```sh
+source /opt/intel/oneapi/setvars.sh
 ```
-for TOOL in g++-latest clang++-12 cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer; do echo $TOOL; $TOOL --version; echo ""; done
+
+Collect all versions:
+
+```sh
+for TOOL in g++-latest clang++-12 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
 ```
