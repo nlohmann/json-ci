@@ -17,7 +17,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git astyle ninja-build make unzip iwyu libidn11 valgrind \
         lsb-release wget software-properties-common clang-tools-11 clang-tidy-11 lcov gpg-agent nvidia-cuda-toolkit \
-        g++-4.8 g++-4.9 g++-5 g++-7 g++-8 g++-9 g++-10 \
+        g++-4.8 g++-4.9 g++-5 g++-7 g++-8 g++-9 g++-10 g++ \
         clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 clang-11 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -26,7 +26,7 @@ RUN apt-get update && \
 # get latest CMake #
 ####################
 
-RUN CMAKE_VERSION=3.20.1 && \
+RUN CMAKE_VERSION=3.20.5 && \
     wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
@@ -43,11 +43,11 @@ RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 12 && rm 
 # get latest GCC #
 ##################
 
-# see https://jwakely.github.io/pkg-gcc-latest/
-RUN wget http://kayari.org/gcc-latest/gcc-latest.deb && dpkg -i gcc-latest.deb && rm gcc-latest.deb && ln -s /opt/gcc-latest/bin/g++ /opt/gcc-latest/bin/g++-latest
-
-ENV PATH=/opt/gcc-latest/bin:${PATH}
-ENV LD_RUN_PATH=/opt/gcc-latest/lib64:${LD_RUN_PATH}
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt-get install -y g++-11 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 #######################
 # get latest cppcheck #
@@ -62,13 +62,13 @@ RUN git clone --depth 1 https://github.com/danmar/cppcheck.git && \
 # get latest OCLint #
 #####################
 
-RUN OCLINT_RELEASE=oclint-21.03-llvm-11.1.0-x86_64-linux-ubuntu-20.04.tar.gz && \
+RUN OCLINT_RELEASE=oclint-21.05-llvm-12.0.0-x86_64-linux-ubuntu-20.04.tar.gz && \
     cd ~ && \
-    wget https://github.com/oclint/oclint/releases/download/v21.03/${OCLINT_RELEASE} && \
+    wget https://github.com/oclint/oclint/releases/download/v21.05/${OCLINT_RELEASE} && \
     tar xfz ${OCLINT_RELEASE} && \
     rm ${OCLINT_RELEASE}
 
-ENV PATH=${PATH}:/root/oclint-21.03/bin
+ENV PATH=${PATH}:/root/oclint-21.05/bin
 
 ##################
 # get PVS Studio #
