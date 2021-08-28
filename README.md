@@ -14,18 +14,18 @@ The goal is to provide a fairly recent C++ build and analysis tool chain.
 
 Versions (as of 2021-07-06):
 
-- Clang 12.0.1-++20210630032618+fed41342a82f-1~exp1~20210630133332.127
+- Clang 13.0.0-++20210828094952+9c49fee5e7ac-1~exp1~20210828075752.71
 - GCC 11.1.0
 - ICC 2021.3.0 20210609
 - Intel(R) oneAPI DPC++ Compiler 2021.3.0 (2021.3.0.20210619)
 - Cppcheck 2.6 dev
 - Clang-Tidy 11.1.0
 - include-what-you-use 0.12
-- CMake 3.20.5
+- CMake 3.21.2
 - Ninja 1.10.1
 - Valgrind 3.15.0
 - OCLint 21.05
-- PVS Studio 7.13.48133.129
+- PVS Studio 7.14.50353.142
 - LCOV 1.14
 - Artistic Style 3.1
 - Infer v1.1.0
@@ -52,6 +52,7 @@ Furthermore, some "historic" C++ compilers are available:
 - clang 9.0.1
 - clang 10.0.0
 - clang 11.0.0
+- clang 12.0.0
 - nvcc 10.1.243
 
 
@@ -66,5 +67,5 @@ source /opt/intel/oneapi/setvars.sh
 Collect all versions:
 
 ```sh
-for TOOL in g++-11 clang++-12 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
+for TOOL in g++-11 clang++-13 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
 ```
