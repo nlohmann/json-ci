@@ -12,20 +12,20 @@ docker pull nlohmann/json-ci:latest
 
 The goal is to provide a fairly recent C++ build and analysis tool chain.
 
-Versions (as of 2021-07-06):
+Versions (as of 2021-10-16):
 
-- Clang 13.0.0-++20210828094952+9c49fee5e7ac-1~exp1~20210828075752.71
+- Clang 14.0.0-++20211015062452+81e9c90686f7-1~exp1~20211015063048.20
 - GCC 11.1.0
 - ICC 2021.3.0 20210609
 - Intel(R) oneAPI DPC++ Compiler 2021.3.0 (2021.3.0.20210619)
-- Cppcheck 2.6 dev
-- Clang-Tidy 11.1.0
+- Cppcheck 2.7 dev
+- Clang-Tidy 14.0.0
 - include-what-you-use 0.12
-- CMake 3.21.2
+- CMake 3.21.3
 - Ninja 1.10.1
 - Valgrind 3.15.0
 - OCLint 21.05
-- PVS Studio 7.14.50353.142
+- PVS Studio 7.15.53134.163
 - LCOV 1.14
 - Artistic Style 3.1
 - Infer v1.1.0
@@ -35,6 +35,7 @@ Furthermore, some "historic" C++ compilers are available:
 - g++ 4.8.5
 - g++ 4.9.3
 - g++ 5.4.0
+- g++ 6.4.0
 - g++ 7.5.0
 - g++ 8.4.0
 - g++ 9.3.0
@@ -53,6 +54,7 @@ Furthermore, some "historic" C++ compilers are available:
 - clang 10.0.0
 - clang 11.0.0
 - clang 12.0.0
+- clang 13.0.1-++20211015123032+cf15ccdeb6d5-1~exp1~20211015003613.5
 - nvcc 10.1.243
 
 
@@ -67,5 +69,5 @@ source /opt/intel/oneapi/setvars.sh
 Collect all versions:
 
 ```sh
-for TOOL in g++-11 clang++-13 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
+for TOOL in g++-11 clang++-14 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
 ```
