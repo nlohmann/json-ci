@@ -12,7 +12,7 @@ docker pull nlohmann/json-ci:latest
 
 The goal is to provide a fairly recent C++ build and analysis tool chain.
 
-Versions (as of 2021-10-16):
+Versions (as of 2021-10-17):
 
 - Clang 14.0.0-++20211015062452+81e9c90686f7-1~exp1~20211015063048.20
 - GCC 11.1.0
