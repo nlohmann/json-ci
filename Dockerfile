@@ -28,7 +28,7 @@ RUN apt-get update && \
 # get latest CMake #
 ####################
 
-RUN CMAKE_VERSION=3.21.3 && \
+RUN CMAKE_VERSION=3.22.0 && \
     wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
@@ -66,13 +66,13 @@ RUN git clone --depth 1 https://github.com/danmar/cppcheck.git && \
 # get latest OCLint #
 #####################
 
-RUN OCLINT_RELEASE=oclint-21.05-llvm-12.0.0-x86_64-linux-ubuntu-20.04.tar.gz && \
+RUN OCLINT_RELEASE=oclint-21.10-llvm-13.0.0-x86_64-linux-ubuntu-20.04.tar.gz && \
     cd ~ && \
-    wget https://github.com/oclint/oclint/releases/download/v21.05/${OCLINT_RELEASE} && \
+    wget https://github.com/oclint/oclint/releases/download/v21.10/${OCLINT_RELEASE} && \
     tar xfz ${OCLINT_RELEASE} && \
     rm ${OCLINT_RELEASE}
 
-ENV PATH=${PATH}:/root/oclint-21.05/bin
+ENV PATH=${PATH}:/root/oclint-21.10/bin
 
 ##################
 # get PVS Studio #
