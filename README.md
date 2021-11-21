@@ -12,10 +12,10 @@ docker pull nlohmann/json-ci:latest
 
 The goal is to provide a fairly recent C++ build and analysis tool chain.
 
-Versions (as of 2021-11-20):
+Versions (as of 2021-11-21):
 
 - Clang 14.0.0-++20211118052719+7ca14f6044bf-1~exp1~20211118173308.62
-- GCC 11.1.0
+- GCC 12.0.0 20211114 (experimental)
 - ICC 2021.4.0 20210910
 - Intel(R) oneAPI DPC++ Compiler 2021.4.0 (2021.4.0.20210924)
 - Cppcheck 2.7 dev
@@ -40,6 +40,7 @@ Furthermore, some "historic" C++ compilers are available:
 - g++ 8.4.0
 - g++ 9.3.0
 - g++ 10.2.0
+- g++ 11.1.0
 - clang 3.5.2
 - clang 3.6.2
 - clang 3.7.1
@@ -69,5 +70,5 @@ source /opt/intel/oneapi/setvars.sh
 Collect all versions:
 
 ```sh
-for TOOL in g++-11 clang++-14 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
+for TOOL in g++-latest clang++-14 icpc icpx cppcheck iwyu cmake ninja valgrind oclint pvs-studio lcov astyle infer nvcc; do echo $TOOL; $TOOL --version; echo ""; done
 ```

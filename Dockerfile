@@ -19,7 +19,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         git astyle ninja-build make unzip iwyu libidn11 valgrind \
         lsb-release wget software-properties-common lcov gpg-agent nvidia-cuda-toolkit \
-        g++-4.8 g++-4.9 g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++ \
+        g++-4.8 g++-4.9 g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++-11 g++ \
         clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 clang-11 clang-12 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -47,11 +47,13 @@ RUN apt-get update && \
 # get latest GCC #
 ##################
 
-RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt-get update && \
-    apt-get install -y g++-11 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN wget http://kayari.org/gcc-latest/gcc-latest.deb && \
+    dpkg -i gcc-latest.deb && \
+    rm -rf gcc-latest.deb && \
+    ln -s /opt/gcc-latest/bin/g++ /opt/gcc-latest/bin/g++-latest && \
+    ln -s /opt/gcc-latest/bin/gcc /opt/gcc-latest/bin/gcc-latest
+
+ENV PATH=${PATH}:/opt/gcc-latest/bin
 
 #######################
 # get latest cppcheck #
