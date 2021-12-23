@@ -28,7 +28,7 @@ RUN apt-get update && \
 # get latest CMake #
 ####################
 
-RUN CMAKE_VERSION=3.22.0 && \
+RUN CMAKE_VERSION=3.22.1 && \
     wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
@@ -107,3 +107,13 @@ RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCT
     apt-get install -y --no-install-recommends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+########################################################################################
+# Add fix from https://stackoverflow.com/a/64051725/266378 for Clang 9 std::filesystem #
+########################################################################################
+
+RUN VERSION=9 && \
+    mkdir -p /root/gcc/$VERSION/include/c++ && \
+    ln -s /usr/include/c++/$VERSION /root/gcc/$VERSION/include/c++/$VERSION && \
+    mkdir -p /root/gcc/$VERSION/lib/gcc/x86_64-unknown-linux-gnu && \
+    ln -s /usr/lib/gcc/x86_64-linux-gnu/$VERSION /root/gcc/$VERSION/lib/gcc/x86_64-unknown-linux-gnu/$VERSION

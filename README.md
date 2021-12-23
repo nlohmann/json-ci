@@ -14,14 +14,14 @@ The goal is to provide a fairly recent C++ build and analysis tool chain.
 
 Versions (as of 2021-11-21):
 
-- Clang 14.0.0-++20211118052719+7ca14f6044bf-1~exp1~20211118173308.62
-- GCC 12.0.0 20211114 (experimental)
-- ICC 2021.4.0 20210910
-- Intel(R) oneAPI DPC++ Compiler 2021.4.0 (2021.4.0.20210924)
+- Clang 14.0.0-++20211221052852+55c71c9eac9b-1~exp1~20211221172954.95
+- GCC 12.0.0 20211219 (experimental)
+- ICC 2021.5.0 20211109
+- Intel(R) oneAPI DPC++ Compiler 2022.0.0 (2022.0.0.20211123)
 - Cppcheck 2.7 dev
 - Clang-Tidy 14.0.0
 - include-what-you-use 0.12
-- CMake 3.22.0
+- CMake 3.22.1
 - Ninja 1.10.0
 - Valgrind 3.15.0
 - OCLint 21.10
