@@ -17,12 +17,32 @@ RUN apt-get update && \
     apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial-updates universe" && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
+        ca-certificates gnupg \
         git astyle ninja-build make unzip iwyu libidn11 valgrind \
-        lsb-release wget software-properties-common lcov gpg-agent nvidia-cuda-toolkit \
+        lsb-release wget software-properties-common lcov gpg-agent \
         g++-4.8 g++-4.9 g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++-11 g++ \
         clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 clang-11 clang-12 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+############################
+# get a newer CUDA Toolkit #
+############################
+
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub && \
+    apt-key add 7fa2af80.pub && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" \
+    | tee /etc/apt/sources.list.d/cuda.list && \
+    apt-get update && \
+    apt-get install -y             \
+      cuda-command-line-tools-11-0 \
+      cuda-compiler-11-0           \
+      cuda-minimal-build-11-0   && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -s cuda-11.0 /usr/local/cuda
+
+ENV PATH=${PATH}:/usr/local/cuda/bin
 
 ####################
 # get latest CMake #
