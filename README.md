@@ -12,20 +12,20 @@ docker pull nlohmann/json-ci:latest
 
 The goal is to provide a fairly recent C++ build and analysis tool chain.
 
-Versions (as of 2021-12-29):
+Versions (as of 2022-04-04):
 
-- Clang 14.0.0-++20211221052852+55c71c9eac9b-1~exp1~20211221172954.95
-- GCC 12.0.0 20211219 (experimental)
+- Clang 15.0.0-++20220403052648+896770c9a92e-1~exp1~20220403172744.209
+- GCC 12.0.0 20220116 (experimental)
 - ICC 2021.5.0 20211109
 - Intel(R) oneAPI DPC++ Compiler 2022.0.0 (2022.0.0.20211123)
 - Cppcheck 2.7 dev
-- Clang-Tidy 14.0.0
+- Clang-Tidy 15.0.0
 - include-what-you-use 0.12
-- CMake 3.22.1
+- CMake 3.23.0
 - Ninja 1.10.0
 - Valgrind 3.15.0
-- OCLint 21.10
-- PVS Studio 7.15.53844.172
+- OCLint 22.02
+- PVS Studio 7.17.56957.190
 - LCOV 1.14
 - Artistic Style 3.1
 - Infer v1.1.0
@@ -56,6 +56,7 @@ Furthermore, some "historic" C++ compilers are available:
 - clang 11.0.0
 - clang 12.0.0
 - clang 13.0.1-++20211015123032+cf15ccdeb6d5-1~exp1~20211015003613.5
+- Clang 14.0.1-++20220402053234+23d08271a4b2-1~exp1~20220402053315.111
 - nvcc 11.0.221
 
 

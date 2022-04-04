@@ -7,7 +7,7 @@ FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
+    apt-get install --no-install-recommends -y software-properties-common && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
     apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ bionic main" && \
     apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ bionic universe" && \
@@ -18,7 +18,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates gnupg \
-        git astyle ninja-build make unzip iwyu libidn11 valgrind \
+        git astyle ninja-build make unzip iwyu xz-utils libidn11 valgrind \
         lsb-release wget software-properties-common lcov gpg-agent \
         g++-4.8 g++-4.9 g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++-11 g++ \
         clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 clang-11 clang-12 && \
@@ -48,7 +48,7 @@ ENV PATH=${PATH}:/usr/local/cuda/bin
 # get latest CMake #
 ####################
 
-RUN CMAKE_VERSION=3.22.1 && \
+RUN CMAKE_VERSION=3.23.0 && \
     wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
@@ -59,9 +59,11 @@ RUN CMAKE_VERSION=3.22.1 && \
 ####################
 
 # see https://apt.llvm.org
-RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && ./llvm.sh 14 && rm llvm.sh
+RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && ./llvm.sh 14 && ./llvm.sh 15 && rm llvm.sh
 RUN apt-get update && \
-    apt-get install -y clang-tools-14 clang-tidy-14
+    apt-get install --no-install-recommends -y clang-tools-15 clang-tidy-15 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ##################
 # get latest GCC #
@@ -88,13 +90,13 @@ RUN git clone --depth 1 https://github.com/danmar/cppcheck.git && \
 # get latest OCLint #
 #####################
 
-RUN OCLINT_RELEASE=oclint-21.10-llvm-13.0.0-x86_64-linux-ubuntu-20.04.tar.gz && \
+RUN OCLINT_RELEASE=oclint-22.02-llvm-13.0.1-x86_64-linux-ubuntu-20.04.tar.gz && \
     cd ~ && \
-    wget https://github.com/oclint/oclint/releases/download/v21.10/${OCLINT_RELEASE} && \
+    wget https://github.com/oclint/oclint/releases/download/v22.02/${OCLINT_RELEASE} && \
     tar xfz ${OCLINT_RELEASE} && \
     rm ${OCLINT_RELEASE}
 
-ENV PATH=${PATH}:/root/oclint-21.10/bin
+ENV PATH=${PATH}:/root/oclint-22.02/bin
 
 ##################
 # get PVS Studio #
