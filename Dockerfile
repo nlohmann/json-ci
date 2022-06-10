@@ -20,6 +20,7 @@ RUN apt-get update && \
         ca-certificates gnupg \
         git astyle ninja-build make unzip iwyu xz-utils libidn11 valgrind \
         lsb-release wget software-properties-common lcov gpg-agent \
+        gcc-multilib g++-multilib \
         g++-4.8 g++-4.9 g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++-11 g++ \
         clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 clang-11 clang-12 && \
     apt-get clean && \
@@ -29,8 +30,7 @@ RUN apt-get update && \
 # get a newer CUDA Toolkit #
 ############################
 
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub && \
-    apt-key add 7fa2af80.pub && \
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub && \
     echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" \
     | tee /etc/apt/sources.list.d/cuda.list && \
     apt-get update && \
@@ -48,7 +48,7 @@ ENV PATH=${PATH}:/usr/local/cuda/bin
 # get latest CMake #
 ####################
 
-RUN CMAKE_VERSION=3.23.0 && \
+RUN CMAKE_VERSION=3.23.2 && \
     wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
     ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
