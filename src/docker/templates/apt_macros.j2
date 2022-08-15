@@ -1,0 +1,11 @@
+{% macro add_repo(repo) -%}
+    RUN apt-add-repository -y "{{ repo }}"
+{%- endmacro %}
+
+{% macro add_ubuntu_repo(codename, components) -%}
+    {% if components is string %}
+        {{ add_repo('deb http://archive.ubuntu.com/ubuntu/ %s %s' % (codename, components)) }}
+    {% else %}
+        {{ add_repo('deb http://archive.ubuntu.com/ubuntu/ %s %s' % (codename, ' '.join(components))) }}
+    {% endif %}
+{%- endmacro -%}

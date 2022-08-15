@@ -1,0 +1,40 @@
+{% import 'apt_macros.j2' as apt %}
+
+FROM ubuntu:{{ codename }} AS json-ci-base-{{ codename }}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install --no-install-recommends -y software-properties-common
+
+# add repositories
+{% block repos %}
+    {{ apt.add_repo('ppa:ubuntu-toolchain-r/test') }}
+{% endblock %}
+
+# install packages
+RUN apt-get update
+{% filter docker.multiline %}
+RUN apt-get install -y --no-install-recommends
+    {% block packages %}
+        ca-certificates git gnupg gpg-agent lsb-release
+        make ninja-build unzip wget xz-utils
+    {% endblock %}
+{% endfilter %}
+
+# install latest CMake
+RUN CMAKE_VERSION=3.24.0
+RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh
+RUN chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh
+RUN ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local --exclude-subdir
+RUN rm -v cmake-$CMAKE_VERSION-Linux-x86_64.sh
+
+# cleanup
+RUN rm -v /usr/local/bin/ccmake /usr/local/bin/cmake-gui /usr/local/bin/cpack
+RUN rm -rf /usr/local/doc/cmake /usr/local/man
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/* && \
+RUN find /usr/lib/x86_64-linux-gnu -type f -iname '*.a' -exec rm -v \{\} \+
+
+{% block cleanup %}
+{% endblock %}

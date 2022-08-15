@@ -1,0 +1,13 @@
+name: Publish Docker images
+
+on:
+  push:
+  pull_request:
+
+jobs:
+<% for image in images %>
+<% filter indent(width=2, first=True) %>
+<% include 'build_and_publish_job.yml.j2' %>
+<% endfilter %>
+
+<% endfor %>

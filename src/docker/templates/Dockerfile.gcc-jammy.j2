@@ -1,0 +1,21 @@
+{%include 'Dockerfile.base-jammy.j2' %}
+
+FROM json-ci-base-jammy AS json-ci-{{ image }}
+
+{% if image_version == 'latest' %}
+    # install latest GCC
+    RUN wget http://kayari.org/gcc-latest/gcc-latest.deb
+    RUN dpkg -i gcc-latest.deb
+    RUN rm -rf gcc-latest.deb
+    RUN ln -sv /opt/gcc-latest/bin/g++ /opt/gcc-latest/bin/g++-latest
+    RUN ln -sv /opt/gcc-latest/bin/gcc /opt/gcc-latest/bin/gcc-latest
+
+    ENV PATH={{ '${PATH}' }}:/opt/gcc-latest/bin
+{% else %}
+    {% filter docker.multiline %}
+        RUN apt-get install -y --no-install-recommends
+            g++-{{ image_version }}
+            # TODO selectively enable multilib
+            g++-{{ image_version }}-multilib
+    {% endfilter %}
+{% endif %}

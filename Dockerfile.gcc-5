@@ -1,0 +1,26 @@
+FROM ubuntu:focal AS json-ci-base-focal
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y software-properties-common && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ bionic main universe" && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial main universe" && \
+    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial-updates main universe" && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates git gnupg gpg-agent lsb-release \
+        make ninja-build unzip wget xz-utils \
+        libidn11 && \
+    CMAKE_VERSION=3.24.0 && \
+    wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
+    chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
+    ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local --exclude-subdir && \
+    rm -v cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
+    rm -v /usr/local/bin/ccmake /usr/local/bin/cmake-gui /usr/local/bin/cpack && \
+    rm -rf /usr/local/doc/cmake /usr/local/man && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \ && \
+    find /usr/lib/x86_64-linux-gnu -type f -iname '*.a' -exec rm -v \{\} \+
+FROM json-ci-base-focal AS json-ci-gcc-5
+RUN apt-get install -y --no-install-recommends \
+        g++-5 \
+        g++-5-multilib

@@ -1,0 +1,10 @@
+{%include 'Dockerfile.base-focal.j2' %}
+
+FROM json-ci-base-focal AS json-ci-{{ image }}
+
+{% filter docker.multiline %}
+    RUN apt-get install -y --no-install-recommends
+        g++-{{ image_version }}
+        # TODO selectively enable multilib
+        g++-{{ image_version }}-multilib
+{% endfilter %}

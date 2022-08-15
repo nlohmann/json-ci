@@ -1,0 +1,8 @@
+{%extends 'Dockerfile.base.j2' %}
+{% set codename='jammy' %}
+
+{% import 'apt_macros.j2' as apt %}
+
+{% block repos %}
+    {{ apt.add_ubuntu_repo('focal', ['main', 'universe']) }}
+{% endblock %}
