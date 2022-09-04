@@ -1,6 +1,8 @@
 JSON_CI_VENV ?= venv
 JSON_CI_USE_VENV ?= true
 
+TOOLS_SRCS = $(shell find tools -type f -name '*.py' | sort)
+
 .ONESHELL:
 .SHELLFLAGS: -e
 
@@ -11,6 +13,12 @@ endif
 
 .PHONY: all
 all: $(VENV_DEP)
+
+# format source files
+.PHONY: pretty
+pretty: $(VENV_DEP)
+	@[ "$(JSON_CI_USE_VENV)" == "true" ] && . $(JSON_CI_VENV)/bin/activate
+	black $(TOOLS_SRCS)
 
 # install a Python virtual environment
 .PHONY: install_venv
