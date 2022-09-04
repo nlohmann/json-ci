@@ -12,13 +12,31 @@ ifeq ($(JSON_CI_USE_VENV),true)
 endif
 
 .PHONY: all
-all: $(VENV_DEP)
+all: update
 
 # format source files
 .PHONY: pretty
 pretty: $(VENV_DEP)
 	@[ "$(JSON_CI_USE_VENV)" == "true" ] && . $(JSON_CI_VENV)/bin/activate
 	black $(TOOLS_SRCS)
+
+# update all
+.PHONY: update
+update: update_docker update_workflows
+
+# update Dockerfiles
+.PHONY: update_docker
+update_docker: $(VENV_DEP)
+	@[ "$(JSON_CI_USE_VENV)" == "true" ] && . $(JSON_CI_VENV)/bin/activate
+	@rm -fv Dockerfile.*
+	./tools/generators/gen_dockerfiles.py
+
+# update GitHub workflows
+.PHONY: update_workflows
+update_workflows: $(VENV_DEP)
+	@[ "$(JSON_CI_USE_VENV)" == "true" ] && . $(JSON_CI_VENV)/bin/activate
+	@rm -fv .github/workflows/*.yml
+	./tools/generators/gen_workflows.py
 
 # install a Python virtual environment
 .PHONY: install_venv

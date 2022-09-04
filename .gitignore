@@ -1,3 +1,5 @@
+/tools/generators/__pycache__/
+
 # venv
 /.venv-stamp
 /venv/
