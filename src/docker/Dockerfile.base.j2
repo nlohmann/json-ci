@@ -1,0 +1,38 @@
+{% import "inc/apt_macros.j2" as apt with context %}
+
+FROM ubuntu:{{ codename }} AS json-ci-base-{{ codename }}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# add repositories
+{{ apt.add_repo("ppa:ubuntu-toolchain-r/test") }}
+{% if codename == "focal" %}
+    {{ apt.add_repo("bionic", ["main", "universe"]) }}
+    {{ apt.add_repo("xenial", ["main", "universe"]) }}
+    {{ apt.add_repo("xenial-updates", ['main', "universe"]) }}
+{% elif codename == "jammy" %}
+    {{ apt.add_repo("focal", ["main", "universe"]) }}
+{% endif %}
+
+# install base packages
+#  gnupg gpg-agent
+{% set base_pkgs=["ca-certificates", "git", "lsb-release", "make", "ninja-build", "unzip", "xz-utils"] %}
+{% set ephemeral_pks=["wget"] %}
+{% if codename == "focal" %}
+    {% do base_pkgs.append("libidn11") %}
+{% endif %}
+{{ apt.install(base_pkgs, ephemeral=ephemeral_pks) }}
+
+# install latest CMake
+{% set cmake_version='3.24.1' %}
+RUN wget https://github.com/Kitware/CMake/releases/download/v{{ cmake_version }}/cmake-{{ cmake_version }}-Linux-x86_64.sh
+RUN chmod a+x cmake-{{ cmake_version }}-Linux-x86_64.sh
+RUN ./cmake-{{ cmake_version }}-Linux-x86_64.sh --skip-license --prefix=/usr/local --exclude-subdir
+RUN rm -v cmake-{{ cmake_version }}-Linux-x86_64.sh
+
+# remove unused files/dirs
+RUN rm -v /usr/local/bin/ccmake /usr/local/bin/cmake-gui /usr/local/bin/cpack
+RUN rm -rf /usr/local/doc/cmake /usr/local/man
+
+# clean up
+{{ apt.cleanup() }}

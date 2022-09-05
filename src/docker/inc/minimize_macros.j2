@@ -1,0 +1,54 @@
+{% import "inc/apt_macros.j2" as apt with context %}
+
+{% macro _trace(log, cmd) %}
+    RUN strace -Afxxyze trace=%file -o {{ log }} {{ cmd }}
+{% endmacro %}
+
+{% macro trace_json(targets, base_dirs) %}
+    {{ apt.install(ephemeral=["strace"]) }}
+
+    {% set trace_log="/json_ci_trace.log" %}
+    {% set trace_paths_log="/json_ci_trace_paths.log" %}
+    {% set paths_log="/json_ci_paths.log" %}
+    RUN git clone https://github.com/nlohmann/json.git /json
+    {{ _trace(trace_log, "cmake -S /json -B /json/build -G Ninja -DJSON_CI=ON") }}
+
+    # trace targets
+    {% for target in targets %}
+        {{ _trace(trace_log, "cmake --build /json/build -t %s" % target) }}
+    {% endfor %}
+
+    # extract file paths from decoded fds and execve calls
+    # all strings are hex-encoded
+    RUN sed -En
+            -e 's/.*= [0-9]+<((\\x[0-9a-f][0-9a-f])*)>/\1/ p'
+            -e 's/^[0-9]+[ ]+execve\("((\\x[0-9a-f][0-9a-f])*)".*/\1/ p'
+            {{ trace_log }}
+        # xargs appears to process the backslash characters without zero-terminated input
+        | tr -t '\n' '\0'
+        | xargs -rn 1 -0 /usr/bin/printf "%b\n"
+        | xargs -rn 1 realpath -m --
+        | sort -u >{{ trace_paths_log }}
+
+    # delete files from base_dirs not listed in paths_log
+    RUN find {{ base_dirs | format_as('"$(realpath -m "{}")"') | join(" ") }} -type f
+        | sort >{{ paths_log }}
+    RUN comm -2 -3
+            {{ paths_log }}
+            {{ trace_paths_log }}
+        | xargs rm --
+
+    # clean up
+    RUN rm -rf /json {{ trace_log }} {{ trace_paths_log }} {{ paths_log }}
+{% endmacro %}
+
+{% macro strip_elf(dirs) %}
+    {{ apt.install(ephemeral=["binutils"]) }}
+
+    RUN find {{ dirs | join(" ") }} -type f -executable
+        | while read f; do
+            if [ "$(head -c4 "$f")" = "$(/usr/bin/printf "%b" "\x7fELF")" ]; then
+                strip "$f";
+            fi
+        done
+{% endmacro %}

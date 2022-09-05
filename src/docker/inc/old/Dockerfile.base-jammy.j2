@@ -1,0 +1,7 @@
+{% import "apt_macros.j2" as apt %}
+
+{%extends "Dockerfile.base.j2" %}
+
+{% block repos %}
+    {{ apt.add_ubuntu_pkg_source("focal", ["main", "universe"]) }}
+{% endblock %}

@@ -1,0 +1,116 @@
+{% set KEY_DIR="/usr/share/keyrings" %}
+{% set LAUNCHPAD_PPA_API="https://launchpad.net/api/1.0/~%s/+archive/%s" %}
+{% set SKS_KEYSERVER="https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x%s" %}
+
+{% macro add_key(uri, filename, dearmor=False) %}
+    {{ install(ephemeral=["wget"] + (["gnupg"] if dearmor else [])) }}
+
+    RUN wget -O - "{{ uri }}"
+    {% if dearmor %}
+        | gpg -q --dearmor
+    {% endif %}
+        >"{{ KEY_DIR }}/{{ filename }}"
+{% endmacro %}
+
+{% macro _add_repo(uri, suite="/", components=None, signed_by=None) %}
+    {% if components is iterable and not components is string %}
+        {% set components=" ".join(components) %}
+    {% endif %}
+
+    {% filter write_to_file("/etc/apt/sources.list.d/json-ci.sources", lstrip=True) %}
+        Types: deb
+        URIs: {{ uri }}
+        Suites: {{ suite }}
+        {% if components %}
+            Components: {{ components }}
+        {% endif %}
+        {% if signed_by %}
+            Signed-By: {{ KEY_DIR }}/{{ signed_by }}
+        {% endif %}
+    {%+ endfilter %}
+
+    {% set _state.apt_need_update = True %}
+{% endmacro %}
+
+# add repository
+#
+# add_repo("https:://repo.tld/", suite="/")
+# add_repo("ppa:...")
+# add_repo("focal", ["main"])
+{% macro add_repo() %}
+    {% if varargs and (varargs[0].startswith("http") or varargs[0].startswith("ftp")) %}
+        {{ _add_repo(*varargs, **kwargs) }}
+    {% elif varargs and varargs[0].startswith("ppa:") %}
+    	{% set ppa = varargs[0].removeprefix("ppa:") %}
+        {% set key_file = (ppa | slugify) + ".gpg" %}
+        {{ install(ephemeral=["ca-certificates", "gnupg", "lsb-release", "wget"]) }}
+
+        # get PPA signing key fingerprint
+        RUN PPA_KEY_FINGERPRINT="$(wget -O - "{{ LAUNCHPAD_PPA_API % tuple(ppa.split("/")) }}"
+            | sed -En 's/.*"signing_key_fingerprint": "([^"]*)".*/\1/ p')"
+
+        {{ add_key(SKS_KEYSERVER % "${PPA_KEY_FINGERPRINT}", key_file, dearmor=True) }}
+
+        {{ _add_repo("https://ppa.launchpadcontent.net/%s/ubuntu/" % ppa, "$(lsb_release -cs)", "main", signed_by=key_file) }}
+    {% else %}
+        {{ _add_repo("http://archive.ubuntu.com/ubuntu/", *varargs, **kwargs) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro update(force=False) %}
+    {% if force or (not _state.apt_need_update is defined or _state.apt_need_update) %}
+        RUN apt-get update
+    {% endif %}
+
+    {% set _state.apt_need_update = False %}
+{% endmacro %}
+
+{% macro install(pkgs=[], ephemeral=[]) %}
+    {{ update() }}
+
+    {% if not _state.apt_pkgs %}
+         {% set _state.apt_pkgs = set() %}
+    {% endif %}
+    {% if not _state.apt_ephemeral_pkgs %}
+        {% set _state.apt_ephemeral_pkgs = set() %}
+    {% endif %}
+
+    {% set install_pkgs=set() %}
+
+    {% for pkg in pkgs %}
+        # upgrade ephemeral packages to permanent ones
+        {% if pkg in  _state.apt_ephemeral_pkgs %}
+            {% do  _state.apt_ephemeral_pkgs.remove(pkg) %}
+            {% do  _state.apt_pkgs.add(pkg) %}
+        {% endif %}
+        # install if not already installed
+        {% if not pkg in  _state.apt_pkgs %}
+            {% do  _state.apt_pkgs.add(pkg) %}
+            {% do  install_pkgs.add(pkg) %}
+        {% endif %}
+    {% endfor %}
+
+    {% for pkg in ephemeral %}
+        # install if not already installed
+        {% if not pkg in  _state.apt_pkgs and not pkg in _state.apt_ephemeral_pkgs %}
+            {% do  _state.apt_ephemeral_pkgs.add(pkg) %}
+            {% do  install_pkgs.add(pkg) %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if install_pkgs %}
+        RUN apt-get install -y --no-install-recommends
+            {{ install_pkgs | sort | join(" ") }}
+    {% endif %}
+{% endmacro %}
+
+{% macro cleanup() %}
+    # remove ephemeral packages
+    {% if _state.apt_ephemeral_pkgs %}
+        RUN apt-get purge -y --autoremove
+            {{ _state.apt_ephemeral_pkgs | sort | join(" ") }}
+    {% endif %}
+
+    RUN apt-get clean
+    RUN rm -rf /var/lib/apt/lists/*
+{% endmacro %}

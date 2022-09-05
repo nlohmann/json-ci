@@ -1,0 +1,19 @@
+ dockerfiles:
+  - template: Dockerfile.base.j2
+    generate: false
+    matrix:
+      - codename: [focal, jammy]
+
+  - template: Dockerfile.cuda.j2
+    with:
+      base_codename: jammy
+      minimize: true
+    matrix:
+      - version: ['11.7']
+
+  - template: Dockerfile.icpc.j2
+    with:
+      base_codename: focal
+      minimize: true
+    matrix:
+      - version: ['2022.1.0']
