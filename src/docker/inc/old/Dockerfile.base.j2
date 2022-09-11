@@ -1,0 +1,31 @@
+{% import "apt_macros.j2" as apt %}
+
+FROM ubuntu:{{ base }} AS json-ci-base-{{ base }}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install --no-install-recommends -y software-properties-common
+
+# add repositories
+{% block repos %}
+    {{ apt.add_repo("ppa:ubuntu-toolchain-r/test") }}
+{% endblock %}
+
+# install packages
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends
+{% block packages %}
+    ca-certificates git gnupg gpg-agent lsb-release make ninja-build unzip wget xz-utils
+{% endblock %}
+
+# install latest CMake
+{% set cmake_version='3.24.1' %}
+RUN wget https://github.com/Kitware/CMake/releases/download/v{{ cmake_version }}/cmake-{{ cmake_version }}-Linux-x86_64.sh
+RUN chmod a+x cmake-{{ cmake_version }}-Linux-x86_64.sh
+RUN ./cmake-{{ cmake_version }}-Linux-x86_64.sh --skip-license --prefix=/usr/local --exclude-subdir
+RUN rm -v cmake-{{ cmake_version }}-Linux-x86_64.sh
+
+# remove unneeded files
+RUN rm -v /usr/local/bin/ccmake /usr/local/bin/cmake-gui /usr/local/bin/cpack
+RUN rm -rf /usr/local/doc/cmake /usr/local/man

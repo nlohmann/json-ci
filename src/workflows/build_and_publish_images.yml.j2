@@ -1,0 +1,58 @@
+name: Build and publish Docker images
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+{% for image in images %}
+  {= "image_%s" % (image.name | slugify) =}:
+    name: Build {= "and publish" if image.publish =} image {= image.name =}
+    runs-on: ubuntu-latest
+  {% if image.dependencies  %}
+    needs: [{= image.dependencies | map(attribute="name") | slugify | prepend("image_") | join(", ") =}]
+  {% endif %}
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to the GitHub Container registry
+        if: {= image.publish | lower =} && github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/{= image.name =}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
+
+      - name: Build and push Docker image {= image.name =}
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: {= image.dockerfile =}
+          push: ${{ {= image.publish | lower =} && github.event_name != 'pull_request' }}
+          cache-from: type=gha
+{% if not image.is_root %}
+          cache-to: type=gha
+{% endif %}
+          target: {= image.name =}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+{% endfor %}

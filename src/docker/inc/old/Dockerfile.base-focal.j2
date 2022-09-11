@@ -1,0 +1,13 @@
+{% import "apt_macros.j2" as apt %}
+
+{%extends "Dockerfile.base.j2" %}
+
+{% block repos %}
+    {{ apt.add_ubuntu_pkg_source("bionic", ["main", "universe"]) }}
+    {{ apt.add_ubuntu_pkg_source("xenial", ["main", "universe"]) }}
+    {{ apt.add_ubuntu_pkg_source("xenial-updates", ['main', "universe"]) }}
+{% endblock %}
+
+{% block packages %}
+    {{ super() }} libidn11
+{% endblock %}

@@ -1,0 +1,80 @@
+FROM ubuntu:jammy AS json-ci-base-jammy
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates gnupg lsb-release wget && \
+    PPA_KEY_FINGERPRINT="$(wget -O - "https://launchpad.net/api/1.0/~ubuntu-toolchain-r/+archive/test" \
+        | sed -En 's/.*"signing_key_fingerprint": "([^"]*)".*/\1/ p')" && \
+    wget -O - "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x${PPA_KEY_FINGERPRINT}" \
+        | gpg -q --dearmor \
+        >"/usr/share/keyrings/ubuntu_toolchain_r_test.gpg" && \
+    printf "Types: deb\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "URIs: https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu/\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Suites: $(lsb_release -cs)\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Components: main\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Signed-By: /usr/share/keyrings/ubuntu_toolchain_r_test.gpg\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Types: deb\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "URIs: http://archive.ubuntu.com/ubuntu/\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Suites: focal\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Components: main universe\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git make ninja-build unzip xz-utils && \
+    wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1-Linux-x86_64.sh && \
+    chmod a+x cmake-3.24.1-Linux-x86_64.sh && \
+    ./cmake-3.24.1-Linux-x86_64.sh --skip-license --prefix=/usr/local --exclude-subdir && \
+    rm -v cmake-3.24.1-Linux-x86_64.sh && \
+    rm -v /usr/local/bin/ccmake /usr/local/bin/cmake-gui /usr/local/bin/cpack && \
+    rm -rf /usr/local/doc/cmake /usr/local/man && \
+    apt-get purge -y --autoremove \
+        gnupg wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
+FROM json-ci-base-jammy AS json-ci-cuda-11.7
+
+ENV CUDA_PATH=/usr/local/cuda
+ENV CUDAHOSTCXX=g++
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        wget && \
+    wget -O - "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-archive-keyring.gpg" \
+        >"/usr/share/keyrings/cuda-archive-keyring.gpg" && \
+    printf "Types: deb\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "URIs: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Suites: /\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "Signed-By: /usr/share/keyrings/cuda-archive-keyring.gpg\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    printf "\n" >>"/etc/apt/sources.list.d/json-ci.sources" && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        cuda-compiler-11-7 cuda-minimal-build-11-7 && \
+    apt-get install -y --no-install-recommends \
+        strace && \
+    git clone https://github.com/nlohmann/json.git /json && \
+    strace -Afxxyze trace=%file -o /json_ci_trace.log cmake -S /json -B /json/build -G Ninja -DJSON_CI=ON && \
+    strace -Afxxyze trace=%file -o /json_ci_trace.log cmake --build /json/build -t ci_cuda_example && \
+    sed -En \
+        -e 's/.*= [0-9]+<((\\x[0-9a-f][0-9a-f])*)>/\1/ p' \
+        -e 's/^[0-9]+[ ]+execve\("((\\x[0-9a-f][0-9a-f])*)".*/\1/ p' \
+        /json_ci_trace.log \
+        | tr -t '\n' '\0' \
+        | xargs -rn 1 -0 /usr/bin/printf "%b\n" \
+        | xargs -rn 1 realpath -m -- \
+        | sort -u >/json_ci_trace_paths.log && \
+    find "$(realpath -m "/usr/local/cuda")" -type f \
+        | sort >/json_ci_paths.log && \
+    comm -2 -3 \
+        /json_ci_paths.log \
+        /json_ci_trace_paths.log \
+        | xargs rm -- && \
+    rm -rf /json /json_ci_trace.log /json_ci_trace_paths.log /json_ci_paths.log && \
+    apt-get purge -y --autoremove \
+        strace wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*

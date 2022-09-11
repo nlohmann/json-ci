@@ -1,0 +1,24 @@
+{% import "inc/apt_macros.j2" as apt with context %}
+{% import "inc/minimize_macros.j2" as min with context %}
+
+FROM json-ci-base-{{ base_codename }} AS json-ci-icpc-{{ version }}
+
+# add Intel key and repository
+{% set intel_repo="https://apt.repos.intel.com" %}
+{% set intel_key="intel-sw-products.gpg" %}
+{{ apt.add_key("%s/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" % intel_repo, intel_key, dearmor=True) }}
+{{ apt.add_repo("%s/oneapi" % intel_repo, "all", "main", signed_by=intel_key) }}
+
+# install Intel C++ compilers
+{{ apt.install(["intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-%s" % version, "g++"]) }}
+
+#RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 99
+
+{% if minimize %}
+    RUN rm -rf
+            /opt/intel/oneapi/compiler/latest/linux/lib/oclfpga
+            /opt/intel/oneapi/debugger
+    RUN . /opt/intel/oneapi/setvars.sh
+    {{ min.trace_json(["ci_icpc"], ["/opt/intel"]) }}
+    {{ min.strip_elf(["/opt/intel"]) }}
+{% endif %}

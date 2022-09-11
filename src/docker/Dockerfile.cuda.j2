@@ -1,0 +1,35 @@
+{% import "inc/apt_macros.j2" as apt with context %}
+{% import "inc/minimize_macros.j2" as min with context %}
+
+FROM json-ci-base-{{ base_codename }} AS json-ci-cuda-{{ version }}
+
+# set CUDA search path
+ENV CUDA_PATH=/usr/local/cuda
+# set CUDA host C++ compiler
+ENV CUDAHOSTCXX=g++
+
+# translate distro codename to NVIDIA distro name
+{% if base_codename == "focal" %}
+    {% set distro="ubuntu2004" %}
+{% elif base_codename == "jammy" %}
+    {% set distro="ubuntu2204" %}
+{% endif %}
+
+# add NVIDIA CUDA key and repository
+{% set cuda_repo="https://developer.download.nvidia.com/compute/cuda/repos/%s/x86_64" % distro %}
+{% set cuda_key="cuda-archive-keyring.gpg" %}
+{{ apt.add_key("%s/%s" % (cuda_repo, cuda_key), cuda_key) }}
+{{ apt.add_repo(cuda_repo, "/", signed_by=cuda_key) }}
+
+# install CUDA packages
+{% set pkg_version=version | replace(".", "-") %}
+{% set pkgs=["cuda-compiler", "cuda-minimal-build"] %}
+{{ apt.install(pkgs | append("-%s" % pkg_version) | list) }}
+
+# remove unused files
+{% if minimize %}
+    {{ min.trace_json(["ci_cuda_example"], ["/usr/local/cuda"]) }}
+{% endif %}
+
+# clean up
+{{ apt.cleanup() }}
