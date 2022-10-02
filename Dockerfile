@@ -9,20 +9,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install --no-install-recommends -y software-properties-common && \
     add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ bionic main" && \
-    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ bionic universe" && \
     apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial main" && \
     apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial universe" && \
-    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial-updates main" && \
-    apt-add-repository -y "deb http://archive.ubuntu.com/ubuntu/ xenial-updates universe" && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates gnupg \
-        git astyle ninja-build make unzip iwyu xz-utils libidn11 valgrind \
+        git astyle ninja-build make unzip iwyu xz-utils libidn11 valgrind cmake \
         lsb-release wget software-properties-common lcov gpg-agent \
         gcc-multilib g++-multilib \
-        g++-4.8 g++-4.9 g++-5 g++-6 g++-7 g++-8 g++-9 g++-10 g++-11 g++ \
-        clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7 clang-8 clang-9 clang-10 clang-11 clang-12 && \
+        g++-4.8 clang && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -43,27 +38,6 @@ RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/
     ln -s cuda-11.0 /usr/local/cuda
 
 ENV PATH=${PATH}:/usr/local/cuda/bin
-
-####################
-# get latest CMake #
-####################
-
-RUN CMAKE_VERSION=3.23.2 && \
-    wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
-    chmod a+x cmake-$CMAKE_VERSION-Linux-x86_64.sh && \
-    ./cmake-$CMAKE_VERSION-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
-    rm cmake-$CMAKE_VERSION-Linux-x86_64.sh
-
-####################
-# get latest Clang #
-####################
-
-# see https://apt.llvm.org
-RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 13 && ./llvm.sh 14 && ./llvm.sh 15 && rm llvm.sh
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y clang-tools-15 clang-tidy-15 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 ##################
 # get latest GCC #
@@ -129,13 +103,3 @@ RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCT
     apt-get install -y --no-install-recommends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-########################################################################################
-# Add fix from https://stackoverflow.com/a/64051725/266378 for Clang 9 std::filesystem #
-########################################################################################
-
-RUN VERSION=9 && \
-    mkdir -p /root/gcc/$VERSION/include/c++ && \
-    ln -s /usr/include/c++/$VERSION /root/gcc/$VERSION/include/c++/$VERSION && \
-    mkdir -p /root/gcc/$VERSION/lib/gcc/x86_64-unknown-linux-gnu && \
-    ln -s /usr/lib/gcc/x86_64-linux-gnu/$VERSION /root/gcc/$VERSION/lib/gcc/x86_64-unknown-linux-gnu/$VERSION
